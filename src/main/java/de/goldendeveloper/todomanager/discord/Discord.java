@@ -79,9 +79,9 @@ public class Discord {
                 ).queue();
         bot.upsertCommand(cmdSettings, "Stellt den Discord Bot für diesen Server ein!")
                 .addSubcommands(
-                        new SubcommandData(cmdSettingsSubCmdSetProcessChannel, "Setzt den Todo Process Channel!").addOption(OptionType.CHANNEL, cmdSettingsSubCmdOptionChannel, "Der Channel in den die Aufgaben gesendet werden sollen!"),
-                        new SubcommandData(cmdSettingsSubCmdSetClosedChannel, "Setzt den Todo Closed Channel!").addOption(OptionType.CHANNEL, cmdSettingsSubCmdOptionChannel, "Der Channel in den die Aufgaben gesendet werden sollen!"),
-                        new SubcommandData(cmdSettingsSubCmdSetOpenChannel, "Setzt den Todo Open Channel!").addOption(OptionType.CHANNEL, cmdSettingsSubCmdOptionChannel, "Der Channel in den die Aufgaben gesendet werden sollen!")
+                        new SubcommandData(cmdSettingsSubCmdSetProcessChannel, "Setzt den Todo Process Channel!").addOption(OptionType.CHANNEL, cmdSettingsSubCmdOptionChannel, "Der Channel in den die Aufgaben gesendet werden sollen!", true),
+                        new SubcommandData(cmdSettingsSubCmdSetClosedChannel, "Setzt den Todo Closed Channel!").addOption(OptionType.CHANNEL, cmdSettingsSubCmdOptionChannel, "Der Channel in den die Aufgaben gesendet werden sollen!", true),
+                        new SubcommandData(cmdSettingsSubCmdSetOpenChannel, "Setzt den Todo Open Channel!").addOption(OptionType.CHANNEL, cmdSettingsSubCmdOptionChannel, "Der Channel in den die Aufgaben gesendet werden sollen!", true)
                 ).queue();
     }
 

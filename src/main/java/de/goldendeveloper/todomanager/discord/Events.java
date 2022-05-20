@@ -9,7 +9,8 @@ import de.goldendeveloper.todomanager.Main;
 import de.goldendeveloper.todomanager.MysqlConnection;
 import de.goldendeveloper.todomanager.discord.utility.TodoList;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.ShutdownEvent;
@@ -25,13 +26,8 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 import java.time.Instant;
 import java.util.Date;
-import java.util.HashMap;
 
 public class Events extends ListenerAdapter {
-
-    private static final String titel = "title";
-    private static final String body = "body";
-
 
     @Override
     public void onShutdown(@NotNull ShutdownEvent e) {
@@ -40,7 +36,7 @@ public class Events extends ListenerAdapter {
         embed.addField(new WebhookEmbed.EmbedField(false, "[Status]", "Offline"));
         embed.addField(new WebhookEmbed.EmbedField(false, "Gestoppt als", Main.getDiscord().getBot().getSelfUser().getName()));
         embed.addField(new WebhookEmbed.EmbedField(false, "Server", Integer.toString(Main.getDiscord().getBot().getGuilds().size())));
-        embed.addField(new WebhookEmbed.EmbedField(false, "Status", "\uD83D\uDFE2 Gestartet"));
+        embed.addField(new WebhookEmbed.EmbedField(false, "Status", "\uD83D\uDD34 Offline"));
         embed.addField(new WebhookEmbed.EmbedField(false, "Version", Main.getDiscord().getProjektVersion()));
         embed.setFooter(new WebhookEmbed.EmbedFooter("@Golden-Developer", Main.getDiscord().getBot().getSelfUser().getAvatarUrl()));
         embed.setTimestamp(new Date().toInstant());
@@ -54,9 +50,12 @@ public class Events extends ListenerAdapter {
     public void onSlashCommandInteraction(SlashCommandInteractionEvent e) {
         User _Coho04_ = e.getJDA().getUserById("513306244371447828");
         User zRazzer = e.getJDA().getUserById("428811057700536331");
+        Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).getTable(MysqlConnection.settingTable);
+        String roleID = table.getRow(table.getColumn(MysqlConnection.clmGuildID), e.getGuild().getId()).get().get(MysqlConnection.clmPermRole).toString();
         String cmd = e.getName();
         if (e.isFromGuild()) {
-            if (e.getMember().hasPermission(Permission.ADMINISTRATOR)) {
+            Role role = e.getGuild().getRoleById(roleID);
+            if (hasRole(role, e.getMember())) {
                 if (cmd.equalsIgnoreCase(Discord.cmdTodo)) {
                     if (e.getSubcommandName() != null) {
                         switch (e.getSubcommandName()) {
@@ -84,7 +83,7 @@ public class Events extends ListenerAdapter {
                     if (e.getUser() == zRazzer || e.getUser() == _Coho04_) {
                         try {
                             e.getInteraction().reply("Der Discord Bot wird nun neugestartet!").queue();
-                            Process p = Runtime.getRuntime().exec("screen -AmdS GD-Manager java -Xms1096M -Xmx1096M -jar GD-Manager-" + Main.getDiscord().getProjektVersion() + ".jar");
+                            Process p = Runtime.getRuntime().exec("screen -AmdS GD-TodoManager java -Xms1096M -Xmx1096M -jar GD-TodoManager-" + Main.getDiscord().getProjektVersion() + ".jar");
                             p.waitFor();
                             e.getJDA().shutdown();
                         } catch (Exception ex) {
@@ -109,10 +108,10 @@ public class Events extends ListenerAdapter {
                     e.reply("Dieser Command konnte nicht gefunden werden!").queue();
                 }
             } else {
-                e.reply("Dazu hast du keine Recht!").queue();
+                e.reply("Dazu hast du keine Rechte!").queue();
             }
         } else {
-            e.reply("Dieser Command ist nur auf einem Server verfügbar").queue();
+            e.reply("Dieser Command ist nur auf einem Server verfügbar!").queue();
         }
     }
 
@@ -139,9 +138,12 @@ public class Events extends ListenerAdapter {
             EmbedBuilder embedBuilder = new EmbedBuilder();
             embedBuilder.setTitle(title);
             embedBuilder.setDescription(description);
+            embedBuilder.addField("Zuletzt aktualisiert", "Von: " + e.getUser().getAsMention(), false);
+            embedBuilder.setTimestamp(new Date().toInstant());
+            embedBuilder.setFooter("@Golden-Developer", e.getJDA().getSelfUser().getAvatarUrl());
             embedBuilder.setColor(Color.GREEN);
             embedBuilder.addField("Todo-ID", "#" + Instant.now().getEpochSecond(), false);
-            e.reply("Das Todo wurde hinzugefügt").setEphemeral(true).queue();
+            e.reply("Das Todo wurde hinzugefügt!").setEphemeral(true).queue();
             TodoList.getTextChannel(e.getGuild(), MysqlConnection.clmOpenChannel).sendMessageEmbeds(embedBuilder.build()).queue();
         }
     }
@@ -150,14 +152,19 @@ public class Events extends ListenerAdapter {
     public void onGuildJoin(GuildJoinEvent e) {
         Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).getTable(MysqlConnection.settingTable);
         if (!table.getColumn(MysqlConnection.clmGuildID).getAll().contains(e.getGuild().getId())) {
-            table.insert(
-                    new RowBuilder()
-                            .with(table.getColumn(MysqlConnection.clmGuildID), e.getGuild().getId())
-                            .with(table.getColumn(MysqlConnection.clmOpenChannel), "")
-                            .with(table.getColumn(MysqlConnection.clmProcessChannel), "")
-                            .with(table.getColumn(MysqlConnection.clmClosedChannel), "")
-                            .build()
-            );
+            e.getGuild().createRole().queue(role ->  {
+                role.getManager().setName("Todo").queue();
+                table.insert(
+                        new RowBuilder()
+                                .with(table.getColumn(MysqlConnection.clmGuildID), e.getGuild().getId())
+                                .with(table.getColumn(MysqlConnection.clmOpenChannel), "")
+                                .with(table.getColumn(MysqlConnection.clmProcessChannel), "")
+                                .with(table.getColumn(MysqlConnection.clmClosedChannel), "")
+                                .with(table.getColumn(MysqlConnection.clmPermRole), role.getId())
+                                .build()
+                );
+            });
+
         }
     }
 
@@ -186,5 +193,14 @@ public class Events extends ListenerAdapter {
         } else {
             e.reply("ERROR: [404][TextChannel not found]").queue();
         }
+    }
+
+    public boolean hasRole(Role role, Member m) {
+        for (Role r : m.getRoles()) {
+            if (r == role) {
+                return true;
+            }
+        }
+        return false;
     }
 }

@@ -14,6 +14,7 @@ public class MysqlConnection {
     public static String clmOpenChannel = "open";
     public static String clmProcessChannel = "process";
     public static String clmClosedChannel = "closed";
+    public static String clmPermRole = "role";
 
     public MysqlConnection(String hostname, String username, String password, int port) {
         mysql = new MYSQL(hostname, username, password, port);
@@ -25,10 +26,22 @@ public class MysqlConnection {
             db.createTable(settingTable);
         }
         Table table = db.getTable(settingTable);
-        table.addColumn(clmGuildID, MysqlTypes.VARCHAR, 80);
-        table.addColumn(clmOpenChannel, MysqlTypes.VARCHAR, 80);
-        table.addColumn(clmProcessChannel, MysqlTypes.VARCHAR, 80);
-        table.addColumn(clmClosedChannel, MysqlTypes.VARCHAR, 80);
+        if (!table.existsColumn(clmGuildID)) {
+            table.addColumn(clmGuildID, MysqlTypes.VARCHAR, 80);
+        }
+        if (!table.existsColumn(clmOpenChannel)) {
+            table.addColumn(clmOpenChannel, MysqlTypes.VARCHAR, 80);
+        }
+        if (!table.existsColumn(clmProcessChannel)) {
+            table.addColumn(clmProcessChannel, MysqlTypes.VARCHAR, 80);
+        }
+        if (!table.existsColumn(clmClosedChannel)) {
+            table.addColumn(clmClosedChannel, MysqlTypes.VARCHAR, 80);
+        }
+        if (!table.existsColumn(clmPermRole)) {
+            table.addColumn(clmPermRole, MysqlTypes.VARCHAR, 80);
+        }
+        System.out.println("MYSQL Finished");
     }
 
     public MYSQL getMysql() {

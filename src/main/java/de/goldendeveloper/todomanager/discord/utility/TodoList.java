@@ -57,45 +57,58 @@ public class TodoList {
         TextChannel closed = getTextChannel(e.getGuild(), MysqlConnection.clmClosedChannel);
         TextChannel waiting = getTextChannel(e.getGuild(), MysqlConnection.clmProcessChannel);
 
-        Message m = getMessageWithTodoID(open, closed, waiting, todoId);
-        if (m != null) {
-            String titel = m.getEmbeds().get(0).getTitle();
-            String description = m.getEmbeds().get(0).getDescription();
 
-            String id = null;
-            for (MessageEmbed.Field field : m.getEmbeds().get(0).getFields()) {
-                if (field.getName().equalsIgnoreCase("Todo-ID")) {
-                    id = field.getValue();
-                }
-            }
+        if (open != null) {
+            if (closed != null) {
+                if (waiting != null) {
+                    Message m = getMessageWithTodoID(open, closed, waiting, todoId);
+                    if (m != null) {
+                        String titel = m.getEmbeds().get(0).getTitle();
+                        String description = m.getEmbeds().get(0).getDescription();
 
-            EmbedBuilder eb = new EmbedBuilder();
-            eb.setTitle(titel, "https://Golden-Developer.de");
-            eb.setDescription(description);
-            eb.setTimestamp(new Date().toInstant());
-            eb.addField("Zuletzt aktualisiert", "Von: " + e.getUser().getAsMention(), false);
-            eb.setFooter("@Golden-Developer", e.getJDA().getSelfUser().getAvatarUrl());
-            if (id != null) {
-                eb.addField("Todo-ID", id, false);
+                        String id = null;
+                        for (MessageEmbed.Field field : m.getEmbeds().get(0).getFields()) {
+                            if (field.getName().equalsIgnoreCase("Todo-ID")) {
+                                id = field.getValue();
+                            }
+                        }
+
+                        EmbedBuilder eb = new EmbedBuilder();
+                        eb.setTitle(titel, "https://Golden-Developer.de");
+                        eb.setDescription(description);
+                        eb.setTimestamp(new Date().toInstant());
+                        eb.addField("Zuletzt aktualisiert", "Von: " + e.getUser().getAsMention(), false);
+                        eb.setFooter("@Golden-Developer", e.getJDA().getSelfUser().getAvatarUrl());
+                        if (id != null) {
+                            eb.addField("Todo-ID", id, false);
+                        }
+                        switch (status) {
+                            case "open" -> {
+                                eb.setColor(Color.GREEN);
+                                open.sendMessageEmbeds(eb.build()).queue();
+                            }
+                            case "closed" -> {
+                                eb.setColor(Color.red);
+                                closed.sendMessageEmbeds(eb.build()).queue();
+                            }
+                            case "waiting" -> {
+                                eb.setColor(Color.CYAN);
+                                waiting.sendMessageEmbeds(eb.build()).queue();
+                            }
+                        }
+                        m.delete().queue();
+                        e.reply("Der Todo Status wurde erfolgreich aktualisiert!").setEphemeral(true).queue();
+                    } else {
+                        e.reply("Es konnte kein Todo mit dieser ID gefunden werden!").setEphemeral(true).queue();
+                    }
+                } else {
+                    e.reply("ERROR: Der Channel für die in Bearbeitung Todos wurde noch nicht gesetzt! Nutze /settings set-prozess-channel").queue();
+                }
+            } else {
+                e.reply("ERROR: Der Channel für die Geschlossenen Todos wurde noch nicht gesetzt! Nutze /settings set-closed-channel").queue();
             }
-            switch (status) {
-                case "open" -> {
-                    eb.setColor(Color.GREEN);
-                    open.sendMessageEmbeds(eb.build()).queue();
-                }
-                case "closed" -> {
-                    eb.setColor(Color.red);
-                    closed.sendMessageEmbeds(eb.build()).queue();
-                }
-                case "waiting" -> {
-                    eb.setColor(Color.CYAN);
-                    waiting.sendMessageEmbeds(eb.build()).queue();
-                }
-            }
-            m.delete().queue();
-            e.reply("Der Todo Status wurde erfolgreich aktualisiert!").setEphemeral(true).queue();
         } else {
-            e.reply("Es konnte kein Todo mit dieser ID gefunden werden!").setEphemeral(true).queue();
+            e.reply("ERROR: Der Channel für die Offenen Todos wurde noch nicht gesetzt! Nutze /settings set-open-channel").queue();
         }
     }
 
@@ -117,12 +130,10 @@ public class TodoList {
     public static Message getMessage(TextChannel channel, String todoID) {
         MessageHistory history = MessageHistory.getHistoryFromBeginning(channel).complete();
         for (Message m : history.getRetrievedHistory()) {
-            System.out.println(m.getContentRaw());
             if (!m.getEmbeds().isEmpty()) {
                 for (MessageEmbed embed : m.getEmbeds()) {
                     for (MessageEmbed.Field field : embed.getFields()) {
                         if (field.getName().equalsIgnoreCase("Todo-ID")) {
-                            System.out.println(field.getValue());
                             if (field.getValue().equalsIgnoreCase(todoID)) {
                                 return m;
                             }
@@ -139,4 +150,4 @@ public class TodoList {
         HashMap<String, Object> row = table.getRow(table.getColumn(MysqlConnection.clmGuildID), guild.getId()).get();
         return guild.getTextChannelById(row.get(column).toString());
     }
- }
+}
