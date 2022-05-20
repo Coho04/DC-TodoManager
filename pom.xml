@@ -90,6 +90,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.github.golden-developer</groupId>
+            <artifactId>MYSQL-Api</artifactId>
+            <version>2.9</version>
+        </dependency>
+        <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-simple</artifactId>
             <version>1.7.36</version>
@@ -103,11 +108,6 @@
             <groupId>club.minnced</groupId>
             <artifactId>discord-webhooks</artifactId>
             <version>0.8.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.Golden-Developer</groupId>
-            <artifactId>MYSQL-Api</artifactId>
-            <version>2.9</version>
         </dependency>
     </dependencies>
 </project>
