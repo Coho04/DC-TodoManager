@@ -9,12 +9,10 @@ import de.goldendeveloper.todomanager.Main;
 import de.goldendeveloper.todomanager.MysqlConnection;
 import de.goldendeveloper.todomanager.discord.utility.TodoList;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.ShutdownEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
+import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -31,20 +29,26 @@ public class Events extends ListenerAdapter {
 
     @Override
     public void onShutdown(@NotNull ShutdownEvent e) {
-        WebhookEmbedBuilder embed = new WebhookEmbedBuilder();
-        embed.setAuthor(new WebhookEmbed.EmbedAuthor(Main.getDiscord().getBot().getSelfUser().getName(), Main.getDiscord().getBot().getSelfUser().getAvatarUrl(), "https://Golden-Developer.de"));
-        embed.addField(new WebhookEmbed.EmbedField(false, "[Status]", "Offline"));
-        embed.addField(new WebhookEmbed.EmbedField(false, "Gestoppt als", Main.getDiscord().getBot().getSelfUser().getName()));
-        embed.addField(new WebhookEmbed.EmbedField(false, "Server", Integer.toString(Main.getDiscord().getBot().getGuilds().size())));
-        embed.addField(new WebhookEmbed.EmbedField(false, "Status", "\uD83D\uDD34 Offline"));
-        embed.addField(new WebhookEmbed.EmbedField(false, "Version", Main.getDiscord().getProjektVersion()));
-        embed.setFooter(new WebhookEmbed.EmbedFooter("@Golden-Developer", Main.getDiscord().getBot().getSelfUser().getAvatarUrl()));
-        embed.setTimestamp(new Date().toInstant());
-        embed.setColor(0xFF0000);
-
-        new WebhookClientBuilder(Main.getConfig().getDiscordWebhook()).build().send(embed.build());
-        System.exit(0);
+        if (Main.getDeployment()) {
+            WebhookEmbedBuilder embed = new WebhookEmbedBuilder();
+            embed.setAuthor(new WebhookEmbed.EmbedAuthor(Main.getDiscord().getBot().getSelfUser().getName(), Main.getDiscord().getBot().getSelfUser().getAvatarUrl(), "https://Golden-Developer.de"));
+            embed.addField(new WebhookEmbed.EmbedField(false, "[Status]", "Offline"));
+            embed.addField(new WebhookEmbed.EmbedField(false, "Gestoppt als", Main.getDiscord().getBot().getSelfUser().getName()));
+            embed.addField(new WebhookEmbed.EmbedField(false, "Server", Integer.toString(Main.getDiscord().getBot().getGuilds().size())));
+            embed.addField(new WebhookEmbed.EmbedField(false, "Status", "\uD83D\uDD34 Offline"));
+            embed.addField(new WebhookEmbed.EmbedField(false, "Version", Main.getDiscord().getProjektVersion()));
+            embed.setFooter(new WebhookEmbed.EmbedFooter("@Golden-Developer", Main.getDiscord().getBot().getSelfUser().getAvatarUrl()));
+            embed.setTimestamp(new Date().toInstant());
+            embed.setColor(0xFF0000);
+            new WebhookClientBuilder(Main.getConfig().getDiscordWebhook()).build().send(embed.build()).thenRun(() -> System.exit(0));
+        }
     }
+
+    @Override
+    public void onGuildLeave(GuildLeaveEvent e) {
+        e.getJDA().getPresence().setActivity(Activity.playing("/help | " + e.getJDA().getGuilds().size() + " Servern"));
+    }
+
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent e) {
@@ -72,43 +76,43 @@ public class Events extends ListenerAdapter {
                             case Discord.cmdSettingsSubCmdSetProcessChannel -> setChannel(e, "process");
                         }
                     }
-                } else if (e.getName().equalsIgnoreCase(Discord.getCmdShutdown)) {
-                    if (e.getUser() == zRazzer || e.getUser() == _Coho04_) {
-                        e.getInteraction().reply("Der Bot wird nun heruntergefahren").queue();
-                        e.getJDA().shutdown();
-                    } else {
-                        e.getInteraction().reply("Dazu hast du keine Rechte du musst für diesen Befehl der Bot Inhaber sein!").queue();
-                    }
-                } else if (e.getName().equalsIgnoreCase(Discord.getCmdRestart)) {
-                    if (e.getUser() == zRazzer || e.getUser() == _Coho04_) {
-                        try {
-                            e.getInteraction().reply("Der Discord Bot wird nun neugestartet!").queue();
-                            Process p = Runtime.getRuntime().exec("screen -AmdS GD-TodoManager java -Xms1096M -Xmx1096M -jar GD-TodoManager-" + Main.getDiscord().getProjektVersion() + ".jar");
-                            p.waitFor();
-                            e.getJDA().shutdown();
-                        } catch (Exception ex) {
-                            ex.printStackTrace();
-                        }
-                    } else {
-                        e.getInteraction().reply("Dazu hast du keine Rechte du musst für diesen Befehl der Bot inhaber sein!").queue();
-                    }
-                } else if (cmd.equalsIgnoreCase(Discord.cmdHelp)) {
-                    EmbedBuilder embed = new EmbedBuilder();
-                    embed.setTitle("**Help Commands**");
-                    embed.setColor(Color.MAGENTA);
-                    for (Command cm : Main.getDiscord().getBot().retrieveCommands().complete()) {
-                        embed.addField("/" + cm.getName(), cm.getDescription(), true);
-                    }
-                    embed.setFooter("@Golden-Developer", e.getJDA().getSelfUser().getAvatarUrl());
-                    e.getInteraction().replyEmbeds(embed.build()).addActionRow(
-                            Button.link("https://wiki.Golden-Developer.de/", "Online Übersicht"),
-                            Button.link("https://support.Golden-Developer.de", "Support Anfragen")
-                    ).queue();
-                } else {
-                    e.reply("Dieser Command konnte nicht gefunden werden!").queue();
                 }
             } else {
                 e.reply("Dazu hast du keine Rechte!").queue();
+            }
+
+            if (e.getName().equalsIgnoreCase(Discord.getCmdShutdown)) {
+                if (e.getUser() == zRazzer || e.getUser() == _Coho04_) {
+                    e.getInteraction().reply("Der Bot wird nun heruntergefahren").queue();
+                    e.getJDA().shutdown();
+                } else {
+                    e.getInteraction().reply("Dazu hast du keine Rechte du musst für diesen Befehl der Bot Inhaber sein!").queue();
+                }
+            } else if (e.getName().equalsIgnoreCase(Discord.getCmdRestart)) {
+                if (e.getUser() == zRazzer || e.getUser() == _Coho04_) {
+                    try {
+                        e.getInteraction().reply("Der Discord Bot wird nun neugestartet!").queue();
+                        Process p = Runtime.getRuntime().exec("screen -AmdS " + Main.getDiscord().getProjektName() + " java -Xms1096M -Xmx1096M -jar " + Main.getDiscord().getProjektName() + "-" + Main.getDiscord().getProjektVersion() + ".jar restart");
+                        p.waitFor();
+                        e.getJDA().shutdown();
+                    } catch (Exception ex) {
+                        ex.printStackTrace();
+                    }
+                } else {
+                    e.getInteraction().reply("Dazu hast du keine Rechte du musst für diesen Befehl der Bot Inhaber sein!").queue();
+                }
+            } else if (cmd.equalsIgnoreCase(Discord.cmdHelp)) {
+                EmbedBuilder embed = new EmbedBuilder();
+                embed.setTitle("**Help Commands**");
+                embed.setColor(Color.MAGENTA);
+                for (Command cm : Main.getDiscord().getBot().retrieveCommands().complete()) {
+                    embed.addField("/" + cm.getName(), cm.getDescription(), true);
+                }
+                embed.setFooter("@Golden-Developer", e.getJDA().getSelfUser().getAvatarUrl());
+                e.getInteraction().replyEmbeds(embed.build()).addActionRow(
+                        Button.link("https://wiki.Golden-Developer.de/", "Online Übersicht"),
+                        Button.link("https://support.Golden-Developer.de", "Support Anfragen")
+                ).queue();
             }
         } else {
             e.reply("Dieser Command ist nur auf einem Server verfügbar!").queue();
@@ -150,6 +154,7 @@ public class Events extends ListenerAdapter {
 
     @Override
     public void onGuildJoin(GuildJoinEvent e) {
+        e.getJDA().getPresence().setActivity(Activity.playing("/help | " + e.getJDA().getGuilds().size() + " Servern"));
         Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).getTable(MysqlConnection.settingTable);
         if (!table.getColumn(MysqlConnection.clmGuildID).getAll().contains(e.getGuild().getId())) {
             e.getGuild().createRole().queue(role ->  {

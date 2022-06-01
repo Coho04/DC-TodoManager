@@ -6,6 +6,7 @@ import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import de.goldendeveloper.todomanager.Main;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
+import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import net.dv8tion.jda.api.requests.GatewayIntent;
@@ -57,9 +58,10 @@ public class Discord {
                     .setAutoReconnect(true)
                     .build().awaitReady();
             registerCommands();
-            if (!System.getProperty("os.name").split(" ")[0].equalsIgnoreCase("windows")) {
+            if (Main.getDeployment()) {
                 Online();
             }
+            bot.getPresence().setActivity(Activity.playing("/help | " + bot.getGuilds().size() + " Servern"));
         } catch (LoginException | InterruptedException e) {
             e.printStackTrace();
         }
@@ -87,9 +89,14 @@ public class Discord {
 
     private void Online() {
         WebhookEmbedBuilder embed = new WebhookEmbedBuilder();
+        if (Main.getRestart()) {
+            embed.setColor(0x33FFFF);
+            embed.addField(new WebhookEmbed.EmbedField(false, "[Status]", "Neustart erfolgreich"));
+        } else {
+            embed.setColor(0x00FF00);
+            embed.addField(new WebhookEmbed.EmbedField(false, "[Status]", "ONLINE"));
+        }
         embed.setAuthor(new WebhookEmbed.EmbedAuthor(getBot().getSelfUser().getName(), getBot().getSelfUser().getAvatarUrl(), "https://Golden-Developer.de"));
-        embed.setColor(0x00FF00);
-        embed.addField(new WebhookEmbed.EmbedField(false, "[Status]", "ONLINE"));
         embed.addField(new WebhookEmbed.EmbedField(false, "Gestartet als", bot.getSelfUser().getName()));
         embed.addField(new WebhookEmbed.EmbedField(false, "Server", Integer.toString(bot.getGuilds().size())));
         embed.addField(new WebhookEmbed.EmbedField(false, "Status", "\uD83D\uDFE2 Gestartet"));
@@ -107,6 +114,16 @@ public class Discord {
             throw new RuntimeException(e);
         }
         return properties.getProperty("version");
+    }
+
+    public String getProjektName() {
+        Properties properties = new Properties();
+        try {
+            properties.load(this.getClass().getClassLoader().getResourceAsStream("project.properties"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return properties.getProperty("name");
     }
 
     public JDA getBot() {

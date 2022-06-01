@@ -1,5 +1,6 @@
 package de.goldendeveloper.todomanager.discord.utility;
 
+import de.goldendeveloper.mysql.entities.SearchResult;
 import de.goldendeveloper.mysql.entities.Table;
 import de.goldendeveloper.todomanager.Main;
 import de.goldendeveloper.todomanager.MysqlConnection;
@@ -147,7 +148,7 @@ public class TodoList {
 
     public static TextChannel getTextChannel(Guild guild, String column) {
         Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).getTable(MysqlConnection.settingTable);
-        HashMap<String, Object> row = table.getRow(table.getColumn(MysqlConnection.clmGuildID), guild.getId()).get();
+        HashMap<String, SearchResult> row = table.getRow(table.getColumn(MysqlConnection.clmGuildID), guild.getId()).get();
         return guild.getTextChannelById(row.get(column).toString());
     }
 }
