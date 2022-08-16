@@ -92,7 +92,7 @@
         <dependency>
             <groupId>com.github.golden-developer</groupId>
             <artifactId>MYSQL-Api</artifactId>
-            <version>3.7</version>
+            <version>4.0</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
