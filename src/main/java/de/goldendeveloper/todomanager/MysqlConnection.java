@@ -27,19 +27,19 @@ public class MysqlConnection {
         }
         Table table = db.getTable(settingTable);
         if (!table.existsColumn(clmGuildID)) {
-            table.addColumn(clmGuildID, MysqlTypes.VARCHAR, 80);
+            table.addColumn(clmGuildID);
         }
         if (!table.existsColumn(clmOpenChannel)) {
-            table.addColumn(clmOpenChannel, MysqlTypes.VARCHAR, 80);
+            table.addColumn(clmOpenChannel);
         }
         if (!table.existsColumn(clmProcessChannel)) {
-            table.addColumn(clmProcessChannel, MysqlTypes.VARCHAR, 80);
+            table.addColumn(clmProcessChannel);
         }
         if (!table.existsColumn(clmClosedChannel)) {
-            table.addColumn(clmClosedChannel, MysqlTypes.VARCHAR, 80);
+            table.addColumn(clmClosedChannel);
         }
         if (!table.existsColumn(clmPermRole)) {
-            table.addColumn(clmPermRole, MysqlTypes.VARCHAR, 80);
+            table.addColumn(clmPermRole);
         }
         System.out.println("MYSQL Finished");
     }
