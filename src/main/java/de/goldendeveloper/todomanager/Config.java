@@ -28,13 +28,18 @@ public class Config {
 
     public Config() {
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
+        System.out.println("One");
         InputStream local = classloader.getResourceAsStream("Login.xml");
+        System.out.println("Two");
         try {
             if (local != null && local.available() == 1) {
+                System.out.println("Three");
                 readXML(local);
             } else {
+                System.out.println("Four");
                 URL xmlResource = getClass().getResource("/config/Login.xml");
                 if (xmlResource != null) {
+                    System.out.println("Five");
                     File xmlFile = new File(xmlResource.getPath());
                     InputStream targetStream = new FileInputStream(xmlFile);
                     readXML(targetStream);
@@ -46,6 +51,7 @@ public class Config {
     }
 
     private void readXML(InputStream inputStream) {
+        System.out.println("Six");
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         try {
             dbf.setFeature(XMLConstants.FEATURE_SECURE_PROCESSING, true);
