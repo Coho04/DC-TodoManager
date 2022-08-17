@@ -10,8 +10,11 @@ import javax.xml.XMLConstants;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 
 public class Config {
 
@@ -25,7 +28,21 @@ public class Config {
 
     public Config() {
         ClassLoader classloader = Thread.currentThread().getContextClassLoader();
-        readXML(classloader.getResourceAsStream("Login.xml"));
+        InputStream local = classloader.getResourceAsStream("Login.xml");
+        try {
+            if (local != null && local.available() == 1) {
+                readXML(local);
+            } else {
+                URL xmlResource = getClass().getResource("/config/Login.xml");
+                if (xmlResource != null) {
+                    File xmlFile = new File(xmlResource.getPath());
+                    InputStream targetStream = new FileInputStream(xmlFile);
+                    readXML(targetStream);
+                }
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private void readXML(InputStream inputStream) {
