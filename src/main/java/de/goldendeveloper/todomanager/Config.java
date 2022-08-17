@@ -37,7 +37,7 @@ public class Config {
                 readXML(local);
             } else {
                 System.out.println("Four");
-                URL xmlResource = getClass().getResource("/config/Login.xml");
+                URL xmlResource = getClass().getResource("/home/Golden-Developer/JavaBots/GD-TodoManager/config/Login.xml");
                 if (xmlResource != null) {
                     System.out.println("Five");
                     File xmlFile = new File(xmlResource.getPath());
