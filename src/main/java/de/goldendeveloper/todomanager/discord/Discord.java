@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
-import javax.security.auth.login.LoginException;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Properties;
@@ -45,9 +44,9 @@ public class Discord {
             bot = JDABuilder.createDefault(Token)
                     .setChunkingFilter(ChunkingFilter.ALL)
                     .setMemberCachePolicy(MemberCachePolicy.ALL)
-                    .enableCache(CacheFlag.MEMBER_OVERRIDES, CacheFlag.ROLE_TAGS, CacheFlag.EMOTE, CacheFlag.ACTIVITY, CacheFlag.CLIENT_STATUS, CacheFlag.ONLINE_STATUS, CacheFlag.VOICE_STATE)
+                    .enableCache(CacheFlag.MEMBER_OVERRIDES, CacheFlag.ROLE_TAGS, CacheFlag.STICKER, CacheFlag.ACTIVITY, CacheFlag.CLIENT_STATUS, CacheFlag.ONLINE_STATUS, CacheFlag.VOICE_STATE)
                     .enableIntents(GatewayIntent.GUILD_MESSAGE_REACTIONS,
-                            GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_EMOJIS,
+                            GatewayIntent.GUILD_MESSAGES, GatewayIntent.GUILD_EMOJIS_AND_STICKERS,
                             GatewayIntent.DIRECT_MESSAGES, GatewayIntent.GUILD_PRESENCES,
                             GatewayIntent.GUILD_BANS, GatewayIntent.DIRECT_MESSAGE_REACTIONS,
                             GatewayIntent.GUILD_INVITES, GatewayIntent.DIRECT_MESSAGE_TYPING,
@@ -62,7 +61,7 @@ public class Discord {
                 Online();
             }
             bot.getPresence().setActivity(Activity.playing("/help | " + bot.getGuilds().size() + " Servern"));
-        } catch (LoginException | InterruptedException e) {
+        } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }

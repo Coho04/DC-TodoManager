@@ -10,6 +10,7 @@ import de.goldendeveloper.todomanager.MysqlConnection;
 import de.goldendeveloper.todomanager.discord.utility.TodoList;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.ShutdownEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
@@ -169,13 +170,12 @@ public class Events extends ListenerAdapter {
                                 .build()
                 );
             });
-
         }
     }
 
 
     public void setChannel(SlashCommandInteractionEvent e, String Channel) {
-        TextChannel channel = e.getOption(Discord.cmdSettingsSubCmdOptionChannel).getAsTextChannel();
+        TextChannel channel = e.getOption(Discord.cmdSettingsSubCmdOptionChannel).getAsChannel().asTextChannel();
         if (channel != null) {
             if (Main.getMysqlConnection().getMysql().existsDatabase(MysqlConnection.dbName)) {
                 if (Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).existsTable(MysqlConnection.settingTable)) {
