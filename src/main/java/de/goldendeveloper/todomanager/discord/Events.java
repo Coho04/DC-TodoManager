@@ -157,7 +157,7 @@ public class Events extends ListenerAdapter {
     public void onGuildJoin(GuildJoinEvent e) {
         e.getJDA().getPresence().setActivity(Activity.playing("/help | " + e.getJDA().getGuilds().size() + " Servern"));
         Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).getTable(MysqlConnection.settingTable);
-        if (!table.getColumn(MysqlConnection.clmGuildID).getAll().contains(e.getGuild().getId())) {
+        if (!table.getColumn(MysqlConnection.clmGuildID).getAll().getAsString().contains(e.getGuild().getId())) {
             e.getGuild().createRole().queue(role ->  {
                 role.getManager().setName("Todo").queue();
                 table.insert(
@@ -180,7 +180,7 @@ public class Events extends ListenerAdapter {
             if (Main.getMysqlConnection().getMysql().existsDatabase(MysqlConnection.dbName)) {
                 if (Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).existsTable(MysqlConnection.settingTable)) {
                     Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).getTable(MysqlConnection.settingTable);
-                    if (table.getColumn(MysqlConnection.clmGuildID).getAll().contains(e.getGuild().getId())) {
+                    if (table.getColumn(MysqlConnection.clmGuildID).getAll().getAsString().contains(e.getGuild().getId())) {
                         switch (Channel) {
                             case "closed" ->
                                     table.getRow(table.getColumn(MysqlConnection.clmGuildID), e.getGuild().getId()).set(table.getColumn(MysqlConnection.clmClosedChannel), channel.getId());
