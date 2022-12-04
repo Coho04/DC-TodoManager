@@ -4,6 +4,7 @@ import club.minnced.discord.webhook.WebhookClientBuilder;
 import club.minnced.discord.webhook.send.WebhookEmbed;
 import club.minnced.discord.webhook.send.WebhookEmbedBuilder;
 import de.goldendeveloper.mysql.entities.RowBuilder;
+import de.goldendeveloper.mysql.entities.SearchResult;
 import de.goldendeveloper.mysql.entities.Table;
 import de.goldendeveloper.todomanager.Main;
 import de.goldendeveloper.todomanager.MysqlConnection;
@@ -56,10 +57,10 @@ public class Events extends ListenerAdapter {
         User _Coho04_ = e.getJDA().getUserById("513306244371447828");
         User zRazzer = e.getJDA().getUserById("428811057700536331");
         Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).getTable(MysqlConnection.settingTable);
-        String roleID = table.getRow(table.getColumn(MysqlConnection.clmGuildID), e.getGuild().getId()).get().get(MysqlConnection.clmPermRole).toString();
+        SearchResult roleID = table.getRow(table.getColumn(MysqlConnection.clmGuildID), e.getGuild().getId()).get().get(MysqlConnection.clmPermRole);
         String cmd = e.getName();
         if (e.isFromGuild()) {
-            Role role = e.getGuild().getRoleById(roleID);
+            Role role = e.getGuild().getRoleById(roleID.getAsString());
             if (hasRole(role, e.getMember())) {
                 if (cmd.equalsIgnoreCase(Discord.cmdTodo)) {
                     if (e.getSubcommandName() != null) {
@@ -79,7 +80,7 @@ public class Events extends ListenerAdapter {
                     }
                 }
             } else {
-                e.reply("Dazu hast du keine Rechte!").queue();
+                e.reply("Dazu hast du keine Rechte! Dir fehlt die Rolle: " + role.getName()).queue();
             }
 
             if (e.getName().equalsIgnoreCase(Discord.getCmdShutdown)) {
