@@ -60,6 +60,7 @@ public class Discord {
                     .build().awaitReady();
             registerCommands();
             if (Main.getDeployment()) {
+                Main.getServerCommunicator().startBot(bot);
                 Online();
             }
             bot.getPresence().setActivity(Activity.playing("/help | " + bot.getGuilds().size() + " Servern"));
@@ -101,31 +102,12 @@ public class Discord {
         embed.addField(new WebhookEmbed.EmbedField(false, "Gestartet als", bot.getSelfUser().getName()));
         embed.addField(new WebhookEmbed.EmbedField(false, "Server", Integer.toString(bot.getGuilds().size())));
         embed.addField(new WebhookEmbed.EmbedField(false, "Status", "\uD83D\uDFE2 Gestartet"));
-        embed.addField(new WebhookEmbed.EmbedField(false, "Version", getProjektVersion()));
+        embed.addField(new WebhookEmbed.EmbedField(false, "Version", Main.getConfig().getProjektVersion()));
         embed.setFooter(new WebhookEmbed.EmbedFooter("@Golden-Developer", getBot().getSelfUser().getAvatarUrl()));
         embed.setTimestamp(new Date().toInstant());
         new WebhookClientBuilder(Main.getConfig().getDiscordWebhook()).build().send(embed.build());
     }
 
-    public String getProjektVersion() {
-        Properties properties = new Properties();
-        try {
-            properties.load(this.getClass().getClassLoader().getResourceAsStream("project.properties"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return properties.getProperty("version");
-    }
-
-    public String getProjektName() {
-        Properties properties = new Properties();
-        try {
-            properties.load(this.getClass().getClassLoader().getResourceAsStream("project.properties"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return properties.getProperty("name");
-    }
 
     public JDA getBot() {
         return bot;
