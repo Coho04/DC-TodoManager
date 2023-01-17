@@ -58,7 +58,7 @@ public class Events extends ListenerAdapter {
         User _Coho04_ = e.getJDA().getUserById("513306244371447828");
         User zRazzer = e.getJDA().getUserById("428811057700536331");
         Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).getTable(MysqlConnection.settingTable);
-        SearchResult roleID = table.getRow(table.getColumn(MysqlConnection.clmGuildID), e.getGuild().getId()).get().get(MysqlConnection.clmPermRole);
+        SearchResult roleID = table.getRow(table.getColumn(MysqlConnection.clmGuildID), e.getGuild().getId()).getData().get(MysqlConnection.clmPermRole);
         String cmd = e.getName();
         if (e.isFromGuild()) {
             Role role = e.getGuild().getRoleById(roleID.getAsString());
