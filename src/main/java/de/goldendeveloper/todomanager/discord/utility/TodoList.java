@@ -32,7 +32,7 @@ public class TodoList {
                 .setPlaceholder("Todo-List Beschreibung").setMinLength(15).setMaxLength(1000).build();
 
         Modal modal = Modal.create(addTodoListModelID, "Hinzufügen eines Todo-Listen eintrags!")
-                .addActionRows(ActionRow.of(title), ActionRow.of(description)).build();
+                .addComponents(ActionRow.of(title), ActionRow.of(description)).build();
         e.replyModal(modal).queue();
     }
 
