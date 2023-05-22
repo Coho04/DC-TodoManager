@@ -11,9 +11,6 @@ public class MysqlConnection {
     public static String dbName = "GD-TodoManager";
     public static String settingTable = "settings";
     public static String clmGuildID = "guild";
-    public static String clmOpenChannel = "open";
-    public static String clmProcessChannel = "process";
-    public static String clmClosedChannel = "closed";
     public static String clmPermRole = "role";
 
     public MysqlConnection(String hostname, String username, String password, int port) {
