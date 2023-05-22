@@ -3,6 +3,7 @@ package de.goldendeveloper.todomanager;
 import de.goldendeveloper.mysql.MYSQL;
 import de.goldendeveloper.mysql.entities.Database;
 import de.goldendeveloper.mysql.entities.Table;
+import de.goldendeveloper.todomanager.discord.utility.TodoTypes;
 
 public class MysqlConnection {
 
@@ -28,18 +29,14 @@ public class MysqlConnection {
         if (!table.existsColumn(clmGuildID)) {
             table.addColumn(clmGuildID);
         }
-        if (!table.existsColumn(clmOpenChannel)) {
-            table.addColumn(clmOpenChannel);
-        }
-        if (!table.existsColumn(clmProcessChannel)) {
-            table.addColumn(clmProcessChannel);
-        }
-        if (!table.existsColumn(clmClosedChannel)) {
-            table.addColumn(clmClosedChannel);
-        }
         if (!table.existsColumn(clmPermRole)) {
             table.addColumn(clmPermRole);
         }
+        TodoTypes.getAllTodoTypes().forEach(todoType -> {
+            if (!table.existsColumn(todoType.getColumnName())) {
+                table.addColumn(todoType.getColumnName());
+            }
+        });
         System.out.println("MYSQL Finished");
     }
 

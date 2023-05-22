@@ -1,52 +1,31 @@
 package de.goldendeveloper.todomanager;
 
-import de.goldendeveloper.todomanager.discord.Discord;
+import de.goldendeveloper.dcbcore.DCBot;
+import de.goldendeveloper.dcbcore.DCBotBuilder;
+import de.goldendeveloper.todomanager.discord.Events;
+import de.goldendeveloper.todomanager.discord.commands.Settings;
+import de.goldendeveloper.todomanager.discord.commands.Todo;
 
 public class Main {
 
-    private static Discord discord;
-    private  static Config config;
-    private  static MysqlConnection mysqlConnection;
-    private static ServerCommunicator serverCommunicator;
-
-    private static Boolean restart = false;
-    private static Boolean deployment = true;
+    private static MysqlConnection mysqlConnection;
+    private static DCBot dcBot;
 
     public static void main(String[] args) {
-        if (args.length >= 1 && args[0].equalsIgnoreCase("restart")) {
-            restart = true;
-        }
-        String device = System.getProperty("os.name").split(" ")[0];
-        if (device.equalsIgnoreCase("windows") || device.equalsIgnoreCase("Mac")) {
-            deployment = false;
-        }
-        config = new Config();
-        serverCommunicator = new ServerCommunicator(Main.getConfig().getServerHostname(), Main.getConfig().getServerPort());
+        CustomConfig config = new CustomConfig();
         mysqlConnection = new MysqlConnection(config.getMysqlHostname(), config.getMysqlUsername(), config.getMysqlPassword(), config.getMysqlPort());
-        discord = new Discord(config.getDiscordToken());
-    }
 
-    public static Config getConfig() {
-        return config;
+        DCBotBuilder dcBotBuilder = new DCBotBuilder(args, true);
+        dcBotBuilder.registerCommands(new Todo(), new Settings());
+        dcBotBuilder.registerEvents(new Events());
+        dcBot = dcBotBuilder.build();
     }
 
     public static MysqlConnection getMysqlConnection() {
         return mysqlConnection;
     }
 
-    public static Discord getDiscord() {
-        return discord;
-    }
-
-    public static Boolean getRestart() {
-        return restart;
-    }
-
-    public static Boolean getDeployment() {
-        return deployment;
-    }
-
-    public static ServerCommunicator getServerCommunicator() {
-        return serverCommunicator;
+    public static DCBot getDcBot() {
+        return dcBot;
     }
 }

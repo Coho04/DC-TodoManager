@@ -4,7 +4,7 @@ import de.goldendeveloper.mysql.entities.SearchResult;
 import de.goldendeveloper.mysql.entities.Table;
 import de.goldendeveloper.todomanager.Main;
 import de.goldendeveloper.todomanager.MysqlConnection;
-import de.goldendeveloper.todomanager.discord.Discord;
+import de.goldendeveloper.todomanager.discord.commands.Todo;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.interactions.components.text.TextInput;
 import net.dv8tion.jda.api.interactions.components.text.TextInputStyle;
 import net.dv8tion.jda.api.interactions.modals.Modal;
 
-import java.awt.*;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -27,22 +26,16 @@ public class TodoList {
     public static void add(SlashCommandInteractionEvent e) {
         TextInput title = TextInput.create(addTodoListModelTitle, "Titel", TextInputStyle.SHORT)
                 .setPlaceholder("Todo-List Title").setMinLength(5).setMaxLength(50).build();
-
         TextInput description = TextInput.create(addTodoListModelDescription, "Beschreibung", TextInputStyle.PARAGRAPH)
                 .setPlaceholder("Todo-List Beschreibung").setMinLength(15).setMaxLength(1000).build();
-
         Modal modal = Modal.create(addTodoListModelID, "Hinzufügen eines Todo-Listen eintrags!")
                 .addComponents(ActionRow.of(title), ActionRow.of(description)).build();
         e.replyModal(modal).queue();
     }
 
     public static void remove(SlashCommandInteractionEvent e) {
-        TextChannel open = getTextChannel(e.getGuild(), MysqlConnection.clmOpenChannel);
-        TextChannel closed = getTextChannel(e.getGuild(), MysqlConnection.clmClosedChannel);
-        TextChannel waiting = getTextChannel(e.getGuild(), MysqlConnection.clmProcessChannel);
-
-        String todoId = e.getOption(Discord.cmdTodoOptionTodo).getAsString();
-        Message m = getMessageWithTodoID(open, closed, waiting, todoId);
+        String todoId = e.getOption(Todo.cmdTodoOptionTodo).getAsString();
+        Message m = getMessageWithTodoID(e.getGuild(), todoId);
         if (m != null) {
             m.delete().queue();
             e.reply("Das Todo wurde erfolgreich gelöscht!").setEphemeral(true).queue();
@@ -52,28 +45,19 @@ public class TodoList {
     }
 
     public static void setStatus(SlashCommandInteractionEvent e) {
-        String todoId = e.getOption(Discord.cmdTodoOptionTodo).getAsString();
-        String status = e.getOption(Discord.cmdTodoSubSetStatusOptionStatus).getAsString();
-
-        TextChannel open = getTextChannel(e.getGuild(), MysqlConnection.clmOpenChannel);
-        TextChannel closed = getTextChannel(e.getGuild(), MysqlConnection.clmClosedChannel);
-        TextChannel waiting = getTextChannel(e.getGuild(), MysqlConnection.clmProcessChannel);
-
-
-        if (open != null) {
-            if (closed != null) {
-                if (waiting != null) {
-                    Message m = getMessageWithTodoID(open, closed, waiting, todoId);
+        String status = e.getOption(Todo.cmdTodoSubSetStatusOptionStatus).getAsString();
+        TodoTypes todoType = TodoTypes.valueOf(status);
+        if (TodoTypes.OPEN.getChannel(e.getGuild()) != null) {
+            if (TodoTypes.CLOSED.getChannel(e.getGuild()) != null) {
+                if (TodoTypes.WAITING.getChannel(e.getGuild()) != null) {
+                    Message m = getMessageWithTodoID(e.getGuild(), e.getOption(Todo.cmdTodoOptionTodo).getAsString());
                     if (m != null) {
                         String titel = m.getEmbeds().get(0).getTitle();
                         String description = m.getEmbeds().get(0).getDescription();
 
-                        String id = null;
-                        for (MessageEmbed.Field field : m.getEmbeds().get(0).getFields()) {
-                            if (field.getName().equalsIgnoreCase("Todo-ID")) {
-                                id = field.getValue();
-                            }
-                        }
+                        String id = m.getEmbeds().get(0).getFields().stream()
+                                .filter(field -> field.getName().equalsIgnoreCase("Todo-ID"))
+                                .findFirst().map(MessageEmbed.Field::getValue).orElse(null);
 
                         EmbedBuilder eb = new EmbedBuilder();
                         eb.setTitle(titel, "https://Golden-Developer.de");
@@ -84,20 +68,8 @@ public class TodoList {
                         if (id != null) {
                             eb.addField("Todo-ID", id, false);
                         }
-                        switch (status) {
-                            case "open" -> {
-                                eb.setColor(Color.GREEN);
-                                open.sendMessageEmbeds(eb.build()).queue();
-                            }
-                            case "closed" -> {
-                                eb.setColor(Color.red);
-                                closed.sendMessageEmbeds(eb.build()).queue();
-                            }
-                            case "waiting" -> {
-                                eb.setColor(Color.CYAN);
-                                waiting.sendMessageEmbeds(eb.build()).queue();
-                            }
-                        }
+                        eb.setColor(todoType.getColor());
+                        todoType.getChannel(e.getGuild()).sendMessageEmbeds(eb.build()).queue();
                         m.delete().queue();
                         e.reply("Der Todo Status wurde erfolgreich aktualisiert!").setEphemeral(true).queue();
                     } else {
@@ -114,33 +86,26 @@ public class TodoList {
         }
     }
 
-    public static Message getMessageWithTodoID(TextChannel open, TextChannel closed, TextChannel waiting, String todoID) {
-        Message m = getMessage(open, todoID);
-        if (m != null) {
-            return m;
+    public static Message getMessageWithTodoID(Guild guild, String todoID) {
+        Message message = getMessage(TodoTypes.OPEN.getChannel(guild), todoID);
+        if (message != null) {
+            return message;
         } else {
-            m = getMessage(closed, todoID);
-            if (m != null) {
-                return m;
+            message = getMessage(TodoTypes.CLOSED.getChannel(guild), todoID);
+            if (message != null) {
+                return message;
             } else {
-                m = getMessage(waiting, todoID);
-                return m;
+                return getMessage(TodoTypes.WAITING.getChannel(guild), todoID);
             }
         }
     }
 
     public static Message getMessage(TextChannel channel, String todoID) {
         MessageHistory history = MessageHistory.getHistoryFromBeginning(channel).complete();
-        for (Message m : history.getRetrievedHistory()) {
-            if (!m.getEmbeds().isEmpty()) {
-                for (MessageEmbed embed : m.getEmbeds()) {
-                    for (MessageEmbed.Field field : embed.getFields()) {
-                        if (field.getName().equalsIgnoreCase("Todo-ID")) {
-                            if (field.getValue().equalsIgnoreCase(todoID)) {
-                                return m;
-                            }
-                        }
-                    }
+        for (Message m : history.getRetrievedHistory().stream().filter(message -> !message.getEmbeds().isEmpty()).toList()) {
+            for (MessageEmbed embed : m.getEmbeds()) {
+                for (MessageEmbed.Field field : embed.getFields().stream().filter(field -> field.getName().equalsIgnoreCase("Todo-ID") && field.getValue().equalsIgnoreCase(todoID)).toList()) {
+                    return m;
                 }
             }
         }
