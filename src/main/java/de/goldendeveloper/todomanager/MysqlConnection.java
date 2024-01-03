@@ -3,7 +3,10 @@ package de.goldendeveloper.todomanager;
 import de.goldendeveloper.mysql.MYSQL;
 import de.goldendeveloper.mysql.entities.Database;
 import de.goldendeveloper.mysql.entities.Table;
+import de.goldendeveloper.mysql.exceptions.NoConnectionException;
 import de.goldendeveloper.todomanager.discord.utility.TodoTypes;
+
+import java.sql.SQLException;
 
 public class MysqlConnection {
 
@@ -13,7 +16,7 @@ public class MysqlConnection {
     public static String clmGuildID = "guild";
     public static String clmPermRole = "role";
 
-    public MysqlConnection(String hostname, String username, String password, int port) {
+    public MysqlConnection(String hostname, String username, String password, int port) throws NoConnectionException, SQLException {
         mysql = new MYSQL(hostname, username, password, port);
         if (!mysql.existsDatabase(dbName)) {
             mysql.createDatabase(dbName);
