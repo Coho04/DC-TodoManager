@@ -1,11 +1,11 @@
 package de.goldendeveloper.todomanager.discord;
 
-import de.goldendeveloper.mysql.entities.RowBuilder;
-import de.goldendeveloper.mysql.entities.Table;
 import de.goldendeveloper.todomanager.Main;
 import de.goldendeveloper.todomanager.MysqlConnection;
 import de.goldendeveloper.todomanager.discord.utility.TodoList;
 import de.goldendeveloper.todomanager.discord.utility.TodoTypes;
+import io.github.coho04.mysql.entities.RowBuilder;
+import io.github.coho04.mysql.entities.Table;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.interaction.ModalInteractionEvent;
