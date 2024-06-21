@@ -1,4 +1,4 @@
-package de.goldendeveloper.todomanager;
+package io.github.coho04.todomanager;
 
 import io.github.coho04.dcbcore.Config;
 

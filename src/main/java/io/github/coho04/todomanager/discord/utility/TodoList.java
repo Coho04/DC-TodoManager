@@ -1,6 +1,6 @@
-package de.goldendeveloper.todomanager.discord.utility;
+package io.github.coho04.todomanager.discord.utility;
 
-import de.goldendeveloper.todomanager.discord.commands.Todo;
+import io.github.coho04.todomanager.discord.commands.Todo;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -55,11 +55,11 @@ public class TodoList {
                                 .findFirst().map(MessageEmbed.Field::getValue).orElse(null);
 
                         EmbedBuilder eb = new EmbedBuilder();
-                        eb.setTitle(titel, "https://Golden-Developer.de");
+                        eb.setTitle(titel);
                         eb.setDescription(description);
                         eb.setTimestamp(new Date().toInstant());
                         eb.addField("Zuletzt aktualisiert", "Von: " + e.getUser().getAsMention(), false);
-                        eb.setFooter("@Golden-Developer", e.getJDA().getSelfUser().getAvatarUrl());
+                        eb.setFooter("@TodoManager", e.getJDA().getSelfUser().getAvatarUrl());
                         if (id != null) {
                             eb.addField("Todo-ID", id, false);
                         }
