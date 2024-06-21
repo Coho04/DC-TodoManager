@@ -1,11 +1,11 @@
-package de.goldendeveloper.todomanager.discord.commands;
+package io.github.coho04.todomanager.discord.commands;
 
-import de.goldendeveloper.dcbcore.DCBot;
-import de.goldendeveloper.dcbcore.interfaces.CommandInterface;
-import de.goldendeveloper.todomanager.Main;
-import de.goldendeveloper.todomanager.MysqlConnection;
-import de.goldendeveloper.todomanager.discord.utility.TodoList;
-import de.goldendeveloper.todomanager.discord.utility.TodoTypes;
+import io.github.coho04.todomanager.discord.utility.TodoList;
+import io.github.coho04.todomanager.Main;
+import io.github.coho04.todomanager.MysqlConnection;
+import io.github.coho04.todomanager.discord.utility.TodoTypes;
+import io.github.coho04.dcbcore.DCBot;
+import io.github.coho04.dcbcore.interfaces.CommandInterface;
 import io.github.coho04.mysql.entities.Table;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;

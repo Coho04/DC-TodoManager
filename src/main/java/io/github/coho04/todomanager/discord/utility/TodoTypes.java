@@ -1,7 +1,7 @@
-package de.goldendeveloper.todomanager.discord.utility;
+package io.github.coho04.todomanager.discord.utility;
 
-import de.goldendeveloper.todomanager.Main;
-import de.goldendeveloper.todomanager.MysqlConnection;
+import io.github.coho04.todomanager.Main;
+import io.github.coho04.todomanager.MysqlConnection;
 import io.github.coho04.mysql.entities.SearchResult;
 import io.github.coho04.mysql.entities.Table;
 import net.dv8tion.jda.api.entities.Guild;

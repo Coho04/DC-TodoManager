@@ -1,9 +1,9 @@
-package de.goldendeveloper.todomanager.discord;
+package io.github.coho04.todomanager.discord;
 
-import de.goldendeveloper.todomanager.Main;
-import de.goldendeveloper.todomanager.MysqlConnection;
-import de.goldendeveloper.todomanager.discord.utility.TodoList;
-import de.goldendeveloper.todomanager.discord.utility.TodoTypes;
+import io.github.coho04.todomanager.discord.utility.TodoList;
+import io.github.coho04.todomanager.discord.utility.TodoTypes;
+import io.github.coho04.todomanager.Main;
+import io.github.coho04.todomanager.MysqlConnection;
 import io.github.coho04.mysql.entities.RowBuilder;
 import io.github.coho04.mysql.entities.Table;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -27,7 +27,7 @@ public class Events extends ListenerAdapter {
             embedBuilder.setDescription(description);
             embedBuilder.addField("Zuletzt aktualisiert", "Von: " + e.getUser().getAsMention(), false);
             embedBuilder.setTimestamp(new Date().toInstant());
-            embedBuilder.setFooter("@Golden-Developer", e.getJDA().getSelfUser().getAvatarUrl());
+            embedBuilder.setFooter("@TodoManager", e.getJDA().getSelfUser().getAvatarUrl());
             embedBuilder.setColor(Color.GREEN);
             embedBuilder.addField("Todo-ID", "#" + Instant.now().getEpochSecond(), false);
             e.reply("Das Todo wurde hinzugefügt!").setEphemeral(true).queue();

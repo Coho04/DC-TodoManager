@@ -1,6 +1,6 @@
-package de.goldendeveloper.todomanager;
+package io.github.coho04.todomanager;
 
-import de.goldendeveloper.todomanager.discord.utility.TodoTypes;
+import io.github.coho04.todomanager.discord.utility.TodoTypes;
 import io.github.coho04.mysql.MYSQL;
 import io.github.coho04.mysql.entities.Database;
 import io.github.coho04.mysql.entities.Table;
