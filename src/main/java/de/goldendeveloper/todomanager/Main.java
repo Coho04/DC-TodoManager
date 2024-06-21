@@ -1,10 +1,10 @@
 package de.goldendeveloper.todomanager;
 
-import de.goldendeveloper.dcbcore.DCBot;
-import de.goldendeveloper.dcbcore.DCBotBuilder;
 import de.goldendeveloper.todomanager.discord.Events;
 import de.goldendeveloper.todomanager.discord.commands.Settings;
 import de.goldendeveloper.todomanager.discord.commands.Todo;
+import io.github.coho04.dcbcore.DCBot;
+import io.github.coho04.dcbcore.DCBotBuilder;
 
 import java.sql.SQLException;
 
