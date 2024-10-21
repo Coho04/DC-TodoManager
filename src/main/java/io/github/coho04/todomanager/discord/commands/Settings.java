@@ -36,7 +36,7 @@ public class Settings implements CommandInterface {
 
     @Override
     public void runSlashCommand(SlashCommandInteractionEvent e, DCBot dcBot) {
-        Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).getTable(MysqlConnection.settingTable);
+        Table table = Main.getMysqlConnection().getMysql().getDatabase(Main.getCustomConfig().getMysqlDatabase()).getTable(MysqlConnection.settingTable);
         String roleID = table.getRow(table.getColumn(MysqlConnection.clmGuildID), e.getGuild().getId()).getData().get(MysqlConnection.clmPermRole).getAsString();
         Role role = e.getGuild().getRoleById(roleID);
         if (hasRole(role, e.getMember()) && e.getSubcommandName() != null) {
@@ -52,9 +52,9 @@ public class Settings implements CommandInterface {
 
     public void setChannel(SlashCommandInteractionEvent e, TodoTypes type) {
         TextChannel textChannel = e.getOption(subCmdOptionChannel).getAsChannel().asTextChannel();
-        if (Main.getMysqlConnection().getMysql().existsDatabase(MysqlConnection.dbName)) {
-            if (Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).existsTable(MysqlConnection.settingTable)) {
-                Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).getTable(MysqlConnection.settingTable);
+        if (Main.getMysqlConnection().getMysql().existsDatabase(Main.getCustomConfig().getMysqlDatabase())) {
+            if (Main.getMysqlConnection().getMysql().getDatabase(Main.getCustomConfig().getMysqlDatabase()).existsTable(MysqlConnection.settingTable)) {
+                Table table = Main.getMysqlConnection().getMysql().getDatabase(Main.getCustomConfig().getMysqlDatabase()).getTable(MysqlConnection.settingTable);
                 if (table.getColumn(MysqlConnection.clmGuildID).getAll().getAsString().contains(e.getGuild().getId())) {
                     Row row = table.getRow(table.getColumn(MysqlConnection.clmGuildID), e.getGuild().getId());
                     row.set(table.getColumn(type.getColumnName()), textChannel.getId());

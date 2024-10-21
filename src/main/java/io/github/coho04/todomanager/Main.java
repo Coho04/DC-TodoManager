@@ -9,20 +9,26 @@ import io.github.coho04.dcbcore.DCBotBuilder;
 public class Main {
 
     private static MysqlConnection mysqlConnection;
+    private static CustomConfig customConfig;
     private static DCBot dcBot;
 
     public static void main(String[] args) {
-        CustomConfig config = new CustomConfig();
-        mysqlConnection = new MysqlConnection(config.getMysqlHostname(), config.getMysqlUsername(), config.getMysqlPassword(), config.getMysqlPort());
+        customConfig = new CustomConfig();
+        mysqlConnection = new MysqlConnection(customConfig.getMysqlHostname(), customConfig.getMysqlUsername(), customConfig.getMysqlPassword(), customConfig.getMysqlPort());
 
         DCBotBuilder dcBotBuilder = new DCBotBuilder(args, true);
         dcBotBuilder.registerCommands(new Todo(), new Settings());
         dcBotBuilder.registerEvents(new Events());
         dcBot = dcBotBuilder.build();
+        System.out.println("Java application started successfully");
     }
 
     public static MysqlConnection getMysqlConnection() {
         return mysqlConnection;
+    }
+
+    public static CustomConfig getCustomConfig() {
+        return customConfig;
     }
 
     public static DCBot getDcBot() {

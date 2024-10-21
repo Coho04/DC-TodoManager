@@ -41,7 +41,7 @@ public enum TodoTypes {
     }
 
     public TextChannel getChannel(Guild guild) {
-        Table table = Main.getMysqlConnection().getMysql().getDatabase(MysqlConnection.dbName).getTable(MysqlConnection.settingTable);
+        Table table = Main.getMysqlConnection().getMysql().getDatabase(Main.getCustomConfig().getMysqlDatabase()).getTable(MysqlConnection.settingTable);
         HashMap<String, SearchResult> row = table.getRow(table.getColumn(MysqlConnection.clmGuildID), guild.getId()).getData();
         return Main.getDcBot().getDiscord().getBot().getTextChannelById(row.get(columnName).toString());
     }
